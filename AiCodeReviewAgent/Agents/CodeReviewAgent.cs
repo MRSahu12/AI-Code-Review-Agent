@@ -7,41 +7,45 @@ namespace AiCodeReviewAgent.Agents;
 public class CodeReviewAgent
 {
     private readonly GitDiffAnalysisTool _diffTool;
+    private readonly SecurityAnalysisTool _securityTool;
+    private readonly TestAnalysisTool _testTool;
     private readonly GeminiService _geminiService;
 
-    public CodeReviewAgent(GitDiffAnalysisTool diffTool, GeminiService geminiService)
+    public CodeReviewAgent(GitDiffAnalysisTool diffTool, SecurityAnalysisTool securityTool, TestAnalysisTool testTool, GeminiService geminiService)
     {
         _diffTool = diffTool;
+        _securityTool = securityTool;
+        _testTool = testTool;
         _geminiService = geminiService;
     }
 
-    public async Task<object> ReviewAsync(
-        string gitDiff,
-        CancellationToken cancellationToken = default)
+    public async Task<object> ReviewAsync(string gitDiff, CancellationToken cancellationToken = default)
     {
-        // Step 1: Validate and analyze Git diff
+        // 1. Analyze Git diff
         var diffAnalysis = _diffTool.Analyze(gitDiff);
 
-        // Step 2: Send Git diff and line mapping to Gemini
-        var aiReview = await _geminiService.AnalyzeAsync(gitDiff, diffAnalysis, cancellationToken);
+        // 2. Run security analysis
+        var securityFindings = _securityTool.Analyze(diffAnalysis);
 
-        // Step 3: Validate AI findings against actual added lines
-        aiReview.Findings = aiReview.Findings
-            .Where(finding =>
-                !string.IsNullOrWhiteSpace(finding.File) &&
-                diffAnalysis.AddedLineDetails.Any(line =>
-                    string.Equals(
-                        line.File.Replace('\\', '/'),
-                        finding.File.Replace('\\', '/'),
-                        StringComparison.OrdinalIgnoreCase)
-                    && line.LineNumber == finding.Line))
-            .ToList();
+        // 3. Run test analysis
+        var testFindings = _testTool.Analyze(diffAnalysis);
 
-        // Step 4: Combine local and AI analysis
+        // 4. Combine local tool findings
+        var toolFindings = securityFindings.Concat(testFindings).ToList();
+
+        // 5. Send diff and tool findings to Gemini
+        var aiReview = await _geminiService.AnalyzeAsync(gitDiff, diffAnalysis, toolFindings, cancellationToken);
+
+        // 6. Return review response
         return new
         {
             Message = "AI code review completed",
             DiffAnalysis = diffAnalysis,
+            ToolAnalysis = new
+            {
+                SecurityFindings = securityFindings,
+                TestFindings = testFindings
+            },
             AiReview = aiReview
         };
     }

@@ -26,10 +26,15 @@ builder.Services.AddScoped<CodeReviewAgent>();
 //            .GetRequiredService<IConfiguration>();
 
 //        var baseUrl = configuration["Gemini:BaseUrl"];
-
 //        client.BaseAddress = new Uri(baseUrl!);
 //        client.Timeout = TimeSpan.FromMinutes(2);
 //    });
+
+
+builder.Services.AddScoped<SecurityAnalysisTool>();
+
+builder.Services.AddScoped<TestAnalysisTool>();
+
 
 
 builder.Services.AddHttpClient<GeminiService>(
@@ -54,10 +59,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

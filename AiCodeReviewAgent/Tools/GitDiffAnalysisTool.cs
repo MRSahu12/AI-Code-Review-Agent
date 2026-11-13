@@ -13,16 +13,10 @@ public class GitDiffAnalysisTool
         if (string.IsNullOrWhiteSpace(gitDiff))
             throw new ArgumentException("Git diff cannot be empty.", nameof(gitDiff));
 
-        var lines = gitDiff
-            .Replace("\r\n", "\n")
-            .Replace('\r', '\n')
-            .Split('\n');
-
+        var lines = gitDiff.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
         var result = new DiffAnalysisResult();
-
         string? currentFile = null;
         string? oldFile = null;
-
         int newLineNumber = 0;
         bool insideHunk = false;
 
@@ -96,9 +90,7 @@ public class GitDiffAnalysisTool
             if (line.StartsWith("+", StringComparison.Ordinal))
             {
                 var content = line.Substring(1);
-
                 result.AddedLines++;
-
                 result.AddedLineDetails.Add(new ChangedLine
                 {
                     File = currentFile,
@@ -126,12 +118,10 @@ public class GitDiffAnalysisTool
     private static string? GetDiffPath(string path)
     {
         path = path.Trim();
-
         if (path == "/dev/null")
             return null;
 
-        if (path.StartsWith("a/", StringComparison.Ordinal) ||
-            path.StartsWith("b/", StringComparison.Ordinal))
+        if (path.StartsWith("a/", StringComparison.Ordinal) || path.StartsWith("b/", StringComparison.Ordinal))
         {
             path = path.Substring(2);
         }
