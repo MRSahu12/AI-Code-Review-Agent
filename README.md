@@ -1,110 +1,103 @@
-\# AI Code Review Agent
+# AI Code Review Agent
 
+## 1. Overview
 
+AI Code Review Agent is an AI-powered code review application built using **C#, ASP.NET Core Web API, and Google Gemini API**.
 
-\## 1. What it does
+It analyzes Git diffs and identifies potential bugs, security vulnerabilities, missing test coverage, and code quality issues. The application combines rule-based static analysis tools with AI-powered reasoning to generate structured code review feedback.
 
+## 2. Technology Stack
 
+- **Backend:** C#, ASP.NET Core Web API
+- **AI Model:** Google Gemini API
+- **API Testing:** Swagger / OpenAPI
+- **Code Analysis:** Custom Git Diff Analysis Tool
+- **Security Analysis:** Rule-based security checks
+- **Test Analysis:** Changed-file test detection
+- **Version Control:** Git and GitHub
 
-An AI-powered code review agent that analyzes Git diffs and identifies potential bugs, security vulnerabilities, performance issues, maintainability problems, and missing test cases.
+## 3. Architecture and Workflow
 
+The application follows a tool-assisted AI agent approach.
 
+1. **GitDiffAnalysisTool:** Parses the Git diff and identifies modified files, added/deleted lines, and changed line numbers.
+2. **SecurityAnalysisTool:** Checks for potential security issues, including SQL injection patterns and hardcoded credentials.
+3. **TestAnalysisTool:** Checks whether test files are included in the submitted changes and highlights potential testing gaps.
+4. **GeminiService:** Sends the Git diff and local analysis findings to Google Gemini for deeper code review.
+5. **CodeReviewAgent:** Orchestrates the analysis tools and AI service and combines their results.
+6. **Review API:** Returns structured JSON containing the summary, overall risk, findings, and missing test recommendations.
 
-It returns structured JSON feedback containing:
+## 4. Key Features
 
-\- Modified files and added/deleted lines.
+- Automated Git diff analysis.
+- Potential bug and security vulnerability detection.
+- Hardcoded credential detection.
+- Missing test coverage recommendations.
+- AI-generated code review feedback.
+- File and line-specific findings.
+- Structured JSON response with severity levels.
+- Swagger-based API testing.
 
-\- Code review findings and severity.
+## 5. How to Run
 
-\- Overall risk assessment.
+**Prerequisites:**
+- .NET SDK
+- Google Gemini API key
+- Visual Studio or VS Code
 
-\- Recommended fixes.
+**Steps:**
 
-\- Missing test cases.
+1. Clone the repository:
 
+   ```bash
+   git clone https://github.com/MRSahu12/AI-Code-Review-Agent.git
+   ```
 
+2. Navigate to the project directory:
 
-\## 2. How it was built
+   ```bash
+   cd AiCodeReviewAgent
+   ```
 
+3. Configure your Gemini API key using .NET User Secrets:
 
+   ```bash
+   dotnet user-secrets init
+   dotnet user-secrets set "Gemini:ApiKey" "YOUR_GEMINI_API_KEY"
+   ```
 
-\*\*Technology stack:\*\*
+4. Configure the Gemini model and API base URL in application settings.
 
-\- Backend: ASP.NET Core Web API (.NET 10)
+5. Run the application:
 
-\- Language: C#
+   ```bash
+   dotnet restore
+   dotnet build
+   dotnet run
+   ```
 
-\- AI Model: Google Gemini API
+6. Open the Swagger URL displayed by the application and submit a Git diff using the review endpoint.
 
-\- API Documentation: Swagger
+## 6. Challenges and How They Were Handled
 
-\- HTTP Communication: HttpClient
+- **Git diff parsing:** Implemented line-level parsing to identify added lines and associate AI findings with changed source locations.
+- **AI response consistency:** Used structured JSON output instructions to obtain predictable review results.
+- **Security analysis:** Combined local rule-based checks with Gemini analysis to identify potential vulnerabilities.
+- **False positives:** AI-generated findings are treated as recommendations and require developer validation.
+- **API reliability:** Added retry handling for transient Gemini API failures and appropriate response parsing.
 
+## 7. Future Enhancements
 
+- GitHub Pull Request integration for automated reviews.
+- Support for multiple programming languages.
+- More comprehensive static code analysis.
+- Unit test execution and coverage analysis.
+- Finding deduplication and confidence scoring.
+- CI/CD pipeline integration.
+- Authentication, authorization, and audit logging.
 
-\*\*Architecture:\*\*
+## 8. Repository
 
-1\. ReviewController receives the Git diff.
+GitHub: https://github.com/MRSahu12/AI-Code-Review-Agent
 
-2\. CodeReviewAgent coordinates the review process.
-
-3\. GitDiffAnalysisTool extracts modified files, added lines, and deleted lines.
-
-4\. GeminiService sends the diff and analysis context to Gemini.
-
-5\. Gemini returns structured JSON feedback.
-
-6\. The agent combines the results and returns the response.
-
-
-
-\## 3. Challenges and how they were handled
-
-
-
-\- OpenAI API quota and billing limitations: switched to Google Gemini.
-
-\- Gemini HTTP 503 errors: implemented retry logic with exponential backoff.
-
-\- Git diff line-number extraction: implemented local diff parsing.
-
-\- AI response parsing: used System.Text.Json to deserialize structured JSON.
-
-\- API key configuration: used configuration-based secret management.
-
-
-
-\## 4. Future improvements
-
-
-
-\- Integrate GitHub Pull Request APIs.
-
-\- Automatically fetch pull request diffs.
-
-\- Add automated unit tests.
-
-\- Support multiple AI providers.
-
-\- Add CI/CD integration.
-
-\- Generate downloadable code review reports.
-
-
-
-\## 5. Running the application
-
-
-
-1\. Configure the Gemini API key using .NET User Secrets.
-
-2\. Configure the Gemini model and BaseUrl in appsettings.json.
-
-3\. Run the ASP.NET Core application.
-
-4\. Open Swagger and submit a Git diff to the Review endpoint.
-
-
-
-\*\*Note:\*\* Never commit API keys or other credentials to GitHub.
-
+**Note:** This is a prototype demonstrating an AI-assisted, tool-based code review workflow. Local security and test checks are heuristic checks, not a replacement for comprehensive static analysis, automated test execution, or human code review.
