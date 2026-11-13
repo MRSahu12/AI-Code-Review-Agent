@@ -19,8 +19,7 @@ public class TestAnalysisTool
 
         if (containsProductionCode && !containsTestFile)
         {
-            findings.Add("No test files were included in this diff. " + "Verify whether existing unit and integration tests " +
-                "cover the changed functionality.");
+         findings.Add("No test files were detected in the submitted Git diff. " + "Please verify whether existing unit and integration tests cover the changed functionality.");
         }
 
         return findings;
