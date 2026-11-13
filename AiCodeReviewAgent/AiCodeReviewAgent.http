@@ -1,6 +1,9 @@
-@AiCodeReviewAgent_HostAddress = http://localhost:5102
+@AiCodeReviewAgent_HostAddress = https://localhost:7102
 
-GET {{AiCodeReviewAgent_HostAddress}}/weatherforecast/
-Accept: application/json
+### AI Code Review
+POST {{AiCodeReviewAgent_HostAddress}}/api/review
+Content-Type: application/json
 
-###
+{
+  "gitDiff": "YOUR_GIT_DIFF_HERE"
+}
